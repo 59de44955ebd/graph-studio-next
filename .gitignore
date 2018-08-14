@@ -1,5 +1,6 @@
 # Build results
 obj/
+Debug/
 
 # MIDL output
 *_dlldata.c

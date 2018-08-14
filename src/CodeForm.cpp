@@ -25,9 +25,9 @@ END_MESSAGE_MAP()
 LPCTSTR	LangNames[] =
 {
 	_T("BAT"),
-	_T("CPP"),
+	_T("C++"),
 	_T("C#"),
-	_T("LUA")
+	_T("Lua")
 };
 int LangNamesCount = sizeof(LangNames)/sizeof(LangNames[0]);
 
@@ -188,7 +188,7 @@ void CCodeForm::OnClickedButtonSave()
 			break;
 		case 1:
 			ext = _T(".cpp");
-			filter = _T("CPP Files (*.cpp)|*.cpp|All Files (*.*)|*.*|");
+			filter = _T("C++ Files (*.cpp)|*.cpp|All Files (*.*)|*.*|");
 			break;
 		case 2:
 			ext = _T(".cs");
@@ -196,7 +196,7 @@ void CCodeForm::OnClickedButtonSave()
 			break;
 		case 3:
 			ext = _T(".lua");
-			filter = _T("LUA Files (*.lua)|*.lua|All Files (*.*)|*.*|");
+			filter = _T("Lua Files (*.lua)|*.lua|All Files (*.*)|*.*|");
 			break;
 	}
 
