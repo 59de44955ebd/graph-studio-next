@@ -14,7 +14,7 @@
 
 **2. XML with relative pathes**
 
-   GraphStudioNext-Enhanced supports import/export of XML files which use relative pathes to source and destination media files. To not break compatibility with GraphStudioNext and its XML/GRFX format, for such files a new file type caled GML is used.
+   GraphStudioNext-Enhanced supports import/export of XML files which use relative pathes to source and destination media files. To not break compatibility with GraphStudioNext and its XML/GRFX format, for such files a new file type called "GML" (*.gml) is used.
 
 **3. Accurate progress info when transcoding**
 
