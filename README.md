@@ -6,8 +6,8 @@
 
 **1. Code Generation**
 
-   The currently loaded graph can be exported as code. At the moment the following languages are available:
-   * BAT (using console tool DScmd)
+   The currently loaded graph can be exported as code (via menu "File" -> "Generate Code..."). At the moment the following languages are available:
+   * BAT (using console DirectShow tool/player DScmd)
    * C++
    * C# (using DirectShowLib)
    * Lua (using LuaJIT and extension "directshow")
