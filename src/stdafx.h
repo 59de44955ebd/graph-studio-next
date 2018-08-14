@@ -254,6 +254,7 @@ using namespace std;
 #include "SbeConfigForm.h"
 #include "DbgLogConfigForm.h"
 #include "CliOptionsForm.h"
+#include "CodeForm.h"
 #include "graphView.h"
 
 #ifdef _UNICODE

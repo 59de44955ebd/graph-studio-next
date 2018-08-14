@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -22,7 +22,8 @@
     <ProjectGuid>{51117F20-9323-4EEE-964D-760C818DF80D}</ProjectGuid>
     <RootNamespace>graphstudionext</RootNamespace>
     <Keyword>MFCProj</Keyword>
-    <ProjectName>graphstudionext</ProjectName>
+    <ProjectName>GraphStudioNext</ProjectName>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -30,22 +31,26 @@
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -65,16 +70,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\bin\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\bin\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Configuration)$(PlatformArchitecture)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">obj\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\bin\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\bin\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Configuration)$(PlatformArchitecture)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">obj\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)$(PlatformArchitecture)</TargetName>
@@ -84,7 +89,8 @@
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>false</MkTypLibCompatible>
-      <ValidateAllParameters>false</ValidateAllParameters>
+      <ValidateAllParameters>
+      </ValidateAllParameters>
       <DllDataFileName>%(Filename)_dlldata.c</DllDataFileName>
     </Midl>
     <ClCompile>
@@ -106,12 +112,13 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>Quartz.lib;strmiids.lib;winmm.lib;mfuuid.lib;msdmo.lib;Dmoguids.lib;d3d9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>BaseClasses.lib;Quartz.lib;strmiids.lib;winmm.lib;mfuuid.lib;msdmo.lib;Dmoguids.lib;d3d9.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <LargeAddressAware>true</LargeAddressAware>
       <DelayLoadDLLs>d3d9.dll</DelayLoadDLLs>
+      <AdditionalLibraryDirectories> $(SolutionDir)lib\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -139,18 +146,19 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>Quartz.lib;strmiids.lib;winmm.lib;mfuuid.lib;msdmo.lib;Dmoguids.lib;d3d9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>BaseClasses.lib;Quartz.lib;strmiids.lib;winmm.lib;mfuuid.lib;msdmo.lib;Dmoguids.lib;d3d9.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
       <DelayLoadDLLs>d3d9.dll</DelayLoadDLLs>
+      <AdditionalLibraryDirectories> $(SolutionDir)lib\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>false</MkTypLibCompatible>
-      <ValidateAllParameters>false</ValidateAllParameters>
+      <ValidateAllParameters>true</ValidateAllParameters>
       <DllDataFileName>%(Filename)_dlldata.c</DllDataFileName>
     </Midl>
     <ClCompile>
@@ -171,14 +179,15 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>Quartz.lib;strmiids.lib;winmm.lib;mfuuid.lib;msdmo.lib;Dmoguids.lib;d3d9.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>BaseClasses.lib;Quartz.lib;strmiids.lib;winmm.lib;mfuuid.lib;msdmo.lib;Dmoguids.lib;d3d9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
       <LargeAddressAware>true</LargeAddressAware>
       <DelayLoadDLLs>d3d9.dll</DelayLoadDLLs>
+      <AdditionalLibraryDirectories> $(SolutionDir)lib\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -205,13 +214,14 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>Quartz.lib;strmiids.lib;winmm.lib;mfuuid.lib;msdmo.lib;Dmoguids.lib;d3d9.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>BaseClasses.lib;Quartz.lib;strmiids.lib;winmm.lib;mfuuid.lib;msdmo.lib;Dmoguids.lib;d3d9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LargeAddressAware>true</LargeAddressAware>
       <DelayLoadDLLs>d3d9.dll</DelayLoadDLLs>
+      <AdditionalLibraryDirectories> $(SolutionDir)lib\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -242,6 +252,9 @@
     <ClInclude Include="src\AnalyzerPage.h" />
     <ClInclude Include="src\BlacklistForm.h" />
     <ClInclude Include="src\CliOptionsForm.h" />
+    <ClInclude Include="src\CodeForm.h" />
+    <ClInclude Include="src\code_gen\GraphCode.h" />
+    <ClInclude Include="src\code_gen\GraphCodeCommon.h" />
     <ClInclude Include="src\ComDllAnalyzer.h" />
     <ClInclude Include="src\ComDllAnalyzerForm.h" />
     <ClInclude Include="src\Crc32.h" />
@@ -255,7 +268,7 @@
     <ClInclude Include="src\display_view.h" />
     <ClInclude Include="src\DMOQualCtrlPage.h" />
     <ClInclude Include="src\FilterFromFile.h" />
-	<ClInclude Include="src\FilterReportGenerator.h" />
+    <ClInclude Include="src\FilterReportGenerator.h" />
     <ClInclude Include="src\filters\analyzer\analyzer.h" />
     <ClInclude Include="src\filters\analyzer\analyzer_pospassthru.h" />
     <ClInclude Include="src\filters\analyzer\analyzer_proppage_config.h" />
@@ -349,6 +362,12 @@
     <ClCompile Include="src\AnalyzerPage.cpp" />
     <ClCompile Include="src\BlacklistForm.cpp" />
     <ClCompile Include="src\CliOptionsForm.cpp" />
+    <ClCompile Include="src\CodeForm.cpp" />
+    <ClCompile Include="src\code_gen\GraphCodeBAT.cpp" />
+    <ClCompile Include="src\code_gen\GraphCodeCSharp.cpp" />
+    <ClCompile Include="src\code_gen\GraphCodeCommon.cpp" />
+    <ClCompile Include="src\code_gen\GraphCodeCPP.cpp" />
+    <ClCompile Include="src\code_gen\GraphCodeLUA.cpp" />
     <ClCompile Include="src\ComDllAnalyzer.cpp" />
     <ClCompile Include="src\ComDllAnalyzerForm.cpp" />
     <ClCompile Include="src\Crc32.cpp" />
@@ -361,7 +380,7 @@
     <ClCompile Include="src\display_view.cpp" />
     <ClCompile Include="src\DMOQualCtrlPage.cpp" />
     <ClCompile Include="src\FilterFromFile.cpp" />
-	<ClCompile Include="src\FilterReportGenerator.cpp" />
+    <ClCompile Include="src\FilterReportGenerator.cpp" />
     <ClCompile Include="src\filters\analyzer\analyzer.cpp" />
     <ClCompile Include="src\filters\analyzer\analyzer_proppage_config.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -382,6 +401,7 @@
     <ClCompile Include="src\filters\video_analyzer\video_analyzer.cpp" />
     <ClCompile Include="src\graphCli.cpp" />
     <ClCompile Include="src\graphDoc.cpp" />
+    <ClCompile Include="src\GraphReportGenerator.cpp" />
     <ClCompile Include="src\graphstudio.cpp" />
     <ClCompile Include="src\GraphStudioModelessDialog.cpp" />
     <ClCompile Include="src\graphView.cpp" />
@@ -455,16 +475,6 @@
     <Midl Include="src\filters\dxva_null\dxva_null.idl" />
     <Midl Include="src\filters\psi_config\psiconfig.idl" />
     <Midl Include="src\filters\time_measure\time_measure.idl" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="baseclasses\BaseClasses.vcxproj">
-      <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
-      <Private>false</Private>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-      <LinkLibraryDependencies>true</LinkLibraryDependencies>
-      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\graphxml.ico" />

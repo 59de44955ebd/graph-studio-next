@@ -7,6 +7,9 @@
 //-----------------------------------------------------------------------------
 #pragma once
 
+// if defined, AVI Muxer is used for seeking, if it exists
+#define SEEK_MUXER
+
 GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 
@@ -176,6 +179,8 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		// Helpers
 		bool IsSource();
 		bool IsRenderer();
+		bool IsMuxer(); //NEW
+
 		int NumOfDisconnectedPins(PIN_DIRECTION dir);
 		int NumOfConnectedPins(PIN_DIRECTION dir);
 		Pin* FirstUnconnectedInputPin();
@@ -294,6 +299,10 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		LONGLONG						min_time_per_frame;		// The minimum time gap between video frames across all pins in the graph. _I64_MAX if unavailable
 
 		const GUID *					m_filter_graph_clsid;
+
+#ifdef SEEK_MUXER
+		IBaseFilter * pMuxer = NULL;
+#endif
 
 	public:
 		DisplayGraph();

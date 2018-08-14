@@ -20,7 +20,6 @@
 
 #pragma warning(disable: 4244)			// DWORD -> BYTE warning
 
-
 GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 	static bool CanSeekByTimeFormat(IMediaSeeking * ims, const GUID & time_format)
@@ -35,7 +34,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 					// Some filters fail to convert time formats even when they advertise they support them
 					// so test the conversion before enabling seeking
 					LONGLONG dummy = 0LL;
-					enable =	SUCCEEDED(ims->ConvertTimeFormat(&dummy, NULL, dummy, &time_format)) && 
+					enable =	SUCCEEDED(ims->ConvertTimeFormat(&dummy, NULL, dummy, &time_format)) &&
 								SUCCEEDED(ims->ConvertTimeFormat(&dummy, &time_format, dummy, NULL));
 				}
 			}
@@ -84,14 +83,14 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			CONST HRESULT hr = input_pin->ipin->QueryInternalConnections(NULL, &nPin);
 			if (hr == S_OK) {
 				// The count (nPin) was zero, and the method returned S_OK, so
-				// this input pin is mapped to exactly zero ouput pins. 
+				// this input pin is mapped to exactly zero ouput pins.
 				// Therefore, it is a rendered input pin.
 				return Filter::FILTER_RENDERER;
 
 			// The heuristics below are unreliable, probably because it matches the default
-			// QueryInternalConnections implementation in the baseclasses 
+			// QueryInternalConnections implementation in the baseclasses
 			//} else if (hr == E_NOTIMPL && filter->output_pins.GetCount() == 0) {
-			// This pin is not mapped to any particular output pin. 
+			// This pin is not mapped to any particular output pin.
 			//	// and there are no output pins
 			//	CComPtr<IUnknown> unk;
 			//	if (S_OK == filter->filter->QueryInterface(__uuidof(IBasicAudio), (void**)&unk)
@@ -157,7 +156,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 	HRESULT DisplayGraph::ConnectToRemote(IFilterGraph *remote_graph)
 	{
 		int ret = MakeNew();
-		if (ret < 0) 
+		if (ret < 0)
 			return E_FAIL;
 
 		// release graph objects
@@ -180,23 +179,23 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 		// attach remote graph
 		HRESULT hr = remote_graph->QueryInterface(IID_IGraphBuilder, (void**)&gb);
-		if (FAILED(hr)) 
+		if (FAILED(hr))
 			return hr;
 
 		// get hold of interfaces
 		hr = gb->QueryInterface(IID_IMediaControl, (void**)&mc);
-		if (FAILED(hr)) 
+		if (FAILED(hr))
 			return hr;
 		hr = gb->QueryInterface(IID_IMediaSeeking, (void**)&ms);
-		if (FAILED(hr)) 
+		if (FAILED(hr))
 			return hr;
 		hr = gb->QueryInterface(IID_IVideoFrameStep, (void**)&fs);
-		if (FAILED(hr)) 
+		if (FAILED(hr))
 			return hr;
 
 		// now we're a remote graph
 		is_remote = true;
-        if(params) 
+        if(params)
 			params->is_remote = true;
 		return hr;
 	}
@@ -261,7 +260,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		HRESULT hr;
 		do {
 			hr = gb.CoCreateInstance(*m_filter_graph_clsid, NULL, CLSCTX_INPROC_SERVER);
-			if (FAILED(hr)) 
+			if (FAILED(hr))
 				break;
 
 			// If log file already open use it with the new graph showing any errors
@@ -372,22 +371,22 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
         IMoniker * pMoniker = NULL;
         IRunningObjectTable *pROT = NULL;
 
-        if (FAILED(GetRunningObjectTable(0, &pROT))) 
+        if (FAILED(GetRunningObjectTable(0, &pROT)))
             return;
-    
+
         const size_t STRING_LENGTH = 256;
 
         WCHAR wsz[STRING_LENGTH];
 
         StringCchPrintfW(
-            wsz, STRING_LENGTH, 
+            wsz, STRING_LENGTH,
             moniker_format_string,
 			(void*)(gb.p),
             GetCurrentProcessId()
             );
-    
+
         HRESULT hr = CreateItemMoniker(L"!", wsz, &pMoniker);
-        if (SUCCEEDED(hr)) 
+        if (SUCCEEDED(hr))
         {
             hr = pROT->Register(ROTFLAGS_REGISTRATIONKEEPSALIVE, gb, pMoniker, &rotRegister);
             pMoniker->Release();
@@ -487,9 +486,9 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		}
 
 		if (is_frame_stepping) {
-			if (fs) 
+			if (fs)
 				hr = fs->CancelStep();
-			if (mc) 
+			if (mc)
 				hr = mc->Run();
 
 			// reset the frame stepping flag
@@ -514,12 +513,12 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		}
 
 		if (is_frame_stepping) {
-			if (fs) 
+			if (fs)
 				hr = fs->CancelStep();
 			is_frame_stepping = false;
 		}
 
-		if (mc) {		
+		if (mc) {
 			hr = mc->Stop();
 			Seek(0);
 			return hr;
@@ -544,14 +543,14 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			}
 		}
 
-		if (mc) 
+		if (mc)
 			hr = mc->Pause();
 		return hr;
 	}
 
 	int DisplayGraph::Seek(double time_ms, BOOL keyframe)
 	{
-		if (!ms) 
+		if (!ms)
 			return E_POINTER;
 
 		REFERENCE_TIME	rtpos = time_ms * (UNITS/1000);
@@ -650,7 +649,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 	}
 
 	// seeking helpers
-	int DisplayGraph::GetFPS(double &fps)	
+	int DisplayGraph::GetFPS(double &fps)
 	{
 		fps = this->fps;
 		return 0;
@@ -753,7 +752,24 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 			// get position
 			try {
-				hr = ms->GetCurrentPosition(&rtCur);
+
+#ifdef SEEK_MUXER
+				// For file writing, results of ms are not accurate. To get the current position in a file-writing graph,
+				// we query the multiplexer filter instead.
+				if (pMuxer) {
+					IMediaSeeking * pMediaSeekingMuxer = NULL;
+					hr = pMuxer->QueryInterface(IID_IMediaSeeking, (void**)&pMediaSeekingMuxer);
+					if (FAILED(hr)) return hr;
+					hr = pMediaSeekingMuxer->GetCurrentPosition(&rtCur);
+					pMediaSeekingMuxer->Release();
+					if (FAILED(hr)) return hr;
+				}
+				else {
+#endif
+					hr = ms->GetCurrentPosition(&rtCur);
+#ifdef SEEK_MUXER
+				}
+#endif
 			}
 			catch (...) {
 				hr = E_FAIL;
@@ -800,7 +816,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		for (int i=0; i<filters.GetCount(); i++) {
 			if (!filters[i]->selected) {				// Filter not selected
 				for (int j=0; j<=1; j++) {
-					CArray<Pin*> & pins = j==0 ? filters[i]->output_pins : filters[i]->input_pins; 
+					CArray<Pin*> & pins = j==0 ? filters[i]->output_pins : filters[i]->input_pins;
 					for (int k=0; k<pins.GetCount(); k++) {
 						Pin * const pin = pins[k];
 						if (!pin->selected && (!pin->peer || !pin->peer->selected))		// pin not selected and not connected to selected pin
@@ -824,8 +840,15 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 					if (pins[k]->peer && !pins[k]->peer->filter->selected)
 						selected_pin = pins[k]->peer;
 				}
-				if (callback) 
+				if (callback)
 					callback->OnFilterRemoved(this, filters[i]);
+
+#ifdef SEEK_MUXER
+				if (filters[i]->filter == pMuxer) {
+					pMuxer = NULL;
+				}
+#endif
+
 				filters[i]->RemoveFromGraph();
 			}
 		}
@@ -862,6 +885,12 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			return hr;
 		}
 
+#ifdef SEEK_MUXER
+		CLSID filter_guid;
+		filter->GetClassID(&filter_guid);
+		if (filter_guid == CLSID_AviDest) pMuxer = filter;
+#endif
+
 		// refresh our filters
 		RefreshFilters();
 		return NOERROR;
@@ -871,13 +900,13 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 	{
 	   CStringA utf8;
 	   int len = WideCharToMultiByte(CP_UTF8, 0, utf16, -1, NULL, 0, 0, 0);
-	   if (len>1) { 
+	   if (len>1) {
 		  char *ptr = utf8.GetBuffer(len-1);
 		  if (ptr) WideCharToMultiByte(CP_UTF8, 0, utf16, -1, ptr, len, 0, 0);
 		  utf8.ReleaseBuffer();
 	   }
 	   return utf8;
-	} 
+	}
 
 	static HRESULT SaveXML_IFileSourceFilter(IBaseFilter *filter, XML::XMLWriter &xml)
 	{
@@ -888,9 +917,18 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			if (SUCCEEDED(src->GetCurFile(&fn, &media_type))) {
 				//	<ifilesourcefilter source="d:\sga.avi"/>
 				xml.BeginNode(_T("ifilesourcefilter"));
+
+				// allows to save relative path
+				if (wcslen(xml.m_folder) && _wcsnicmp(fn, xml.m_folder, wcslen(xml.m_folder)) == 0) {
+					WCHAR * p = fn + wcslen(xml.m_folder);
+					xml.WriteValue(_T("source"), CString(p));
+				}
+				else {
 					xml.WriteValue(_T("source"), CString(fn));
+				}
+
 				xml.EndNode();
-				if (fn) 
+				if (fn)
 					CoTaskMemFree(fn);
 			}
 		}
@@ -906,9 +944,18 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			if (SUCCEEDED(sink->GetCurFile(&fn, &media_type))) {
 				//	<ifilesinkfilter dest="d:\sga.avi"/>
 				xml.BeginNode(_T("ifilesinkfilter"));
+
+				// allows to save relative path
+				if (wcslen(xml.m_folder) && _wcsnicmp(fn, xml.m_folder, wcslen(xml.m_folder)) == 0) {
+					WCHAR * p = fn + wcslen(xml.m_folder);
+					xml.WriteValue(_T("dest"), CString(p));
+				}
+				else {
 					xml.WriteValue(_T("dest"), CString(fn));
+				}
+
 				xml.EndNode();
-				if (fn) 
+				if (fn)
 					CoTaskMemFree(fn);
 			}
 		}
@@ -924,8 +971,8 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			CComPtr<IStream> stream;
 			CreateStreamOnHGlobal(hglobal_stream, FALSE, &stream);
 
-			if (stream 
-					&& hglobal_stream  
+			if (stream
+					&& hglobal_stream
 					&& SUCCEEDED(hr = persist_stream->Save(stream, TRUE))) {
 
 				const SIZE_T binary_max_size = GlobalSize(hglobal_stream);
@@ -965,7 +1012,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				ASSERT(!"Failed to create IStream");
 			}
 			if (hglobal_stream)
-				GlobalFree(hglobal_stream);		
+				GlobalFree(hglobal_stream);
 		}
 		return S_OK;
 	}
@@ -978,7 +1025,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			CString guid_name;
 
 			// name major and/or sub type if known for readability of XML file
-			if (NameGuid(mt.majortype, guid_name, false)) {		
+			if (NameGuid(mt.majortype, guid_name, false)) {
 				type_name = guid_name;
 			}
 			if (NameGuid(mt.subtype, guid_name, false)) {
@@ -1021,7 +1068,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			xml.BeginNode(_T("format"));
 			{
 				CString guid_name;
-				if (NameGuid(mt.formattype, guid_name, false)) {		
+				if (NameGuid(mt.formattype, guid_name, false)) {
 					xml.WriteValue(_T("type"), guid_name);
 				}
 
@@ -1100,7 +1147,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		ASSERT(in_pin_index >= 0);
 
 		xml.BeginNode(_T("connect"));
-			// Write these first to make XML more 
+			// Write these first to make XML more
 			xml.WriteValue(_T("out"), filter->name + _T("/") + pin->name);
 			xml.WriteValue(_T("in"), pin->peer->filter->name + _T("/") + pin->peer->name);
 
@@ -1138,7 +1185,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		// Now let's add all the connections
 		// Loop over filters only saving connections from filters whose input connections have been saved already
 		// until all connections have been saved
-		while (!all_inputs_saved) {		
+		while (!all_inputs_saved) {
 			if (iterations++ > 500)	{	// Sanity check to prevent pathological infinite looping
 				ASSERT(false);
 				break;
@@ -1147,14 +1194,14 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			all_inputs_saved = true;	// test every filter for unsaved input connections in loop below
 
 			for (int of=0; of<filters.GetCount(); of++) {
-				
+
 				const Filter * const filter = filters[of];
 				bool inputs_saved = true;
 
 				// Look for any unsaved connections on input pins
 				for (int j=0; j<filter->input_pins.GetCount(); j++) {
 					const Pin* const pin = filter->input_pins[j];
-					if (pin->peer && saved_input_pins.find(pin) == saved_input_pins.end()) {		
+					if (pin->peer && saved_input_pins.find(pin) == saved_input_pins.end()) {
 						inputs_saved = false;		// found input pin with unsaved connection
 						break;
 					}
@@ -1182,12 +1229,12 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 	{
 		xml.BeginNode(_T("filter"));
 			// save the filter CLSID. If the filter is a wrapper it will initialize properly
-			// after loading IPersistStream 
+			// after loading IPersistStream
 			xml.WriteValue(_T("name"), filter->name);
 			xml.WriteValue(_T("index"), index);
 
 			CString guid_name;
-			if (NameGuid(filter->clsid, guid_name, false)) {		
+			if (NameGuid(filter->clsid, guid_name, false)) {
 				xml.WriteValue(_T("class"), guid_name);
 			}
 
@@ -1221,6 +1268,19 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 	{
 		XML::XMLWriter			xml;
 
+		CPath	path(fn);
+		CString	ext = path.GetExtension();
+		ext = ext.MakeLower();
+		if (ext == _T(".gml")){
+			// save folder of XML file
+			wcscpy(xml.m_folder, fn.GetBuffer());
+			WCHAR * p = wcsrchr(xml.m_folder, L'\\');
+			if (p) *p = 0;
+			wcscat(xml.m_folder, L"\\");
+		}else{
+			wcscpy(xml.m_folder, L"");
+		}
+
 		xml.BeginNode(_T("graph"));
 			xml.WriteValue(_T("name"), _T("Unnamed Graph"));
 			if(!uses_clock)
@@ -1249,7 +1309,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 	HRESULT DisplayGraph::LoadXML(CString fn)
 	{
 		XML::XMLFile xml;
-		
+
 		HRESULT	hr = xml.LoadFromFile(fn);
 		if (FAILED(hr)) {
 			return hr;
@@ -1258,7 +1318,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		// load graph
 		XML::XMLNode * const root = xml.root;
 		XML::XMLIterator it;
-		if (root->Find(_T("graph"), &it) < 0) 
+		if (root->Find(_T("graph"), &it) < 0)
 			return VFW_E_NOT_FOUND;
 
 		XML::XMLNode * const gn = *it;
@@ -1286,11 +1346,11 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 					filter_clock = created_filter;
 					ASSERT(filter_clock);
 				}
-			} 
+			}
 			else if (node->name == _T("connect"))
 				connection_nodes.Add(node);
-			else if (node->name == _T("config")) 
-				hr = LoadXML_Config(node); 
+			else if (node->name == _T("config"))
+				hr = LoadXML_Config(node);
 		}
 
 		// Iterate all connections until none left or no remaining connections succeed
@@ -1301,7 +1361,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		CArray<CString>	errors;
 
 		while (connections_made &&
-				iterations++ < MAX_ITERATIONS) {					
+				iterations++ < MAX_ITERATIONS) {
 
 			hresults.RemoveAll();
 			errors.RemoveAll();
@@ -1309,7 +1369,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 			for (int i=0; i<connection_nodes.GetCount(); /* incremented below */ ) {
 				CString error_string;
-				hr = LoadXML_Connect(connection_nodes[i], filters_loaded_order, error_string); 
+				hr = LoadXML_Connect(connection_nodes[i], filters_loaded_order, error_string);
 
 				if (SUCCEEDED(hr)) {
 					connections_made = true;
@@ -1332,19 +1392,19 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		for (int i=0; i<hresults.GetCount() && i<errors.GetCount(); i++) {
 			if (!DSUtil::ShowError(hresults[i], errors[i]))
 				return S_OK;										// stop displaying errors and give up if cancel pressed
-		}	
+		}
 
 		// Load remaining nodes that need to be processed after all filters have been connected
 		for (it = gn->nodes.begin(); it != gn->nodes.end(); it++) {
 			XML::XMLNode * node = *it;
 
-			if (node->name == _T("command")) 
-				hr = LoadXML_Command(node); 
-			else if (node->name == _T("schedule")) 
-				hr = LoadXML_Schedule(node); 
-			else if (node->name == _T("iamgraphstreams")) 
-				hr = LoadXML_IAMGraphStreams(node); 
-			else if (node->name == _T("render")) 
+			if (node->name == _T("command"))
+				hr = LoadXML_Command(node);
+			else if (node->name == _T("schedule"))
+				hr = LoadXML_Schedule(node);
+			else if (node->name == _T("iamgraphstreams"))
+				hr = LoadXML_IAMGraphStreams(node);
+			else if (node->name == _T("render"))
 				hr = LoadXML_Render(node);
 			else
 				hr = S_FALSE;
@@ -1372,11 +1432,11 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			const CString	action  = node->GetValue(_T("action"));
 
 			int act = 0;
-			if (action == _T("start")) 
-				act = ScheduleEvent::ACTION_START; 
-			else if (action == _T("stop")) 
-				act = ScheduleEvent::ACTION_STOP; 
-			else if (action == _T("restart")) 
+			if (action == _T("start"))
+				act = ScheduleEvent::ACTION_START;
+			else if (action == _T("stop"))
+				act = ScheduleEvent::ACTION_STOP;
+			else if (action == _T("restart"))
 				act = ScheduleEvent::ACTION_RESTART;
 
 			if (view->form_schedule) {
@@ -1397,7 +1457,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 		const CString pin_name = conf->GetValue(_T("pin"));
 		Pin	* const pin = gf.FindPinByName(pin_name);
-		if (!pin) 
+		if (!pin)
 			return VFW_E_NOT_FOUND;
 
 		// let's query for IAMBufferNegotiation
@@ -1405,7 +1465,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		CComPtr<IAMBufferNegotiation>	buf_neg;
 
 		HRESULT hr = pin->ipin->QueryInterface(IID_IAMBufferNegotiation, (void**)&buf_neg);
-		if (FAILED(hr)) 
+		if (FAILED(hr))
 			return hr;
 
 		hr = DSUtil::EnumMediaTypes(pin->ipin, mtlist);
@@ -1416,13 +1476,13 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 		// if it's an audio pin, we need to calculate the buffer size
 		const CMediaType mt = mtlist[0];
-		if (mt.majortype == MEDIATYPE_Audio && 
+		if (mt.majortype == MEDIATYPE_Audio &&
 			mt.subtype == MEDIASUBTYPE_PCM &&
-			mt.formattype == FORMAT_WaveFormatEx && 
+			mt.formattype == FORMAT_WaveFormatEx &&
 			mt.cbFormat >= sizeof(WAVEFORMATEX)) {
 			int		latency_ms = conf->GetValue(_T("latency"), -1);
 			if (latency_ms > 0) {
-			
+
 				const WAVEFORMATEX * const wfx = (WAVEFORMATEX*)mt.pbFormat;
 
 				// just like MSDN said: -1 = we don't care
@@ -1443,7 +1503,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 	HRESULT DisplayGraph::LoadXML_IAMGraphStreams(XML::XMLNode *node)
 	{
-		if (!gb) 
+		if (!gb)
 			return E_POINTER;
 
 		// <iamgraphstreams sync="1"/>
@@ -1484,7 +1544,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		} else if (msg == _T("stop")) {
 			DoStop();
 		} else if (msg == _T("progress")) {
-			
+
 			CMainFrame * const frame = (CMainFrame*)AfxGetMainWnd();
 			if (frame) {
 				// run in the progress mode
@@ -1499,16 +1559,16 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 	{
 		const CString pin_path = node->GetValue(_T("pin"));
 		Pin	* const pin = FindPinByPath(pin_path);
-		if (!pin) 
+		if (!pin)
 			return VFW_E_NOT_FOUND;
 
 		// try to render
 		params->MarkRender(true);
 		HRESULT	hr = gb->Render(pin->ipin);
 		params->MarkRender(false);
-		if (callback) 
+		if (callback)
 			callback->OnRenderFinished();
-		if (FAILED(hr)) 
+		if (FAILED(hr))
 			return hr;
 
 		// reload newly added filters
@@ -1598,21 +1658,21 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				switch (CgraphstudioApp::g_ResolvePins) {
 					case CgraphstudioApp::BY_ID: {
 						// Work around buggy filters that return unsuitable pins or NULL from IBaseFilter::FindPin by searching manually for ID match
-					
+
 						out_id = node->GetValue(_T("outPinId"));
 						out_pin = out_filter->FindPinByID(out_id);
 						if (!out_pin || out_pin->connected || out_pin->dir == PINDIR_INPUT)
 							out_pin = out_filter->FindPinByMatchingID(out_id);
-					
+
 						in_id = node->GetValue(_T("inPinId"));
 						in_pin = in_filter->FindPinByID(in_id);
 						if (!in_pin || in_pin->connected || in_pin->dir == PINDIR_OUTPUT)
 							in_pin = in_filter->FindPinByMatchingID(in_id);
-					
+
 					}	break;
 
 					case CgraphstudioApp::BY_INDEX: {
-					
+
 						int index = node->GetValue(_T("outPinIndex"), -1);
 						if (index >= 0 && index < out_filter->output_pins.GetCount())
 							out_pin = out_filter->output_pins[index];
@@ -1623,7 +1683,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 						if (index >= 0 && index < in_filter->input_pins.GetCount())
 							in_pin = in_filter->input_pins[index];
 						if (!in_pin)
-							in_id.Format(_T("%d"), index); 
+							in_id.Format(_T("%d"), index);
 
 					}	break;
 
@@ -1632,7 +1692,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 						out_id = node->GetValue(_T("outPinName"));
 						out_pin = out_filter->FindPinByName(out_id);
-					
+
 						in_id = node->GetValue(_T("inPinName"));
 						in_pin = in_filter->FindPinByName(in_id);
 
@@ -1649,11 +1709,11 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 		if (!out_pin || !in_pin) {
 			if (!out_filter || !in_filter) {
-				error_string.Format(_T("Could not find %s filter index %d"), 
+				error_string.Format(_T("Could not find %s filter index %d"),
 						out_filter ? _T("input")	: _T("output"),
 						out_filter ? ifilter_index : ofilter_index);
 			} else {
-				error_string.Format(_T("Could not find %s pin %s on filter %s"), 
+				error_string.Format(_T("Could not find %s pin %s on filter %s"),
 						out_pin ? _T("input") : _T("output"),
 						out_pin ? (LPCTSTR)in_id : (LPCTSTR)out_id,
 						out_pin ? (LPCTSTR)in_filter->display_name : (LPCTSTR)out_filter->display_name);
@@ -1671,7 +1731,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			const bool use_media_type = SUCCEEDED(LoadXML_MediaType(node, media_type));
 			if (use_media_type)
 				LoadXML_MediaTypeFormat(node, media_type);
-				
+
 			// Only use media type for connection if we managed to load it
 			hr = gb->ConnectDirect(out_pin->ipin, in_pin->ipin, use_media_type ? &media_type : NULL);
 			if (FAILED(hr) && use_media_type) {
@@ -1681,8 +1741,8 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		}
 
 		if (FAILED(hr)) {
-			error_string.Format(_T("Error connecting %s pin %s to %s pin %s"), 
-					(const TCHAR *)out_filter->name,	
+			error_string.Format(_T("Error connecting %s pin %s to %s pin %s"),
+					(const TCHAR *)out_filter->name,
 					(const TCHAR *)out_pin->name,
 					(const TCHAR *)in_filter->name,
 					(const TCHAR *)in_pin->name);
@@ -1698,13 +1758,13 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 	{
 		const CString name = node->GetValue(_T("name"));
 		Filter * const filter = FindFilter(name);
-		if (!filter) 
+		if (!filter)
 			return VFW_E_NOT_FOUND;
 
 		for (XML::XMLIterator it = node->nodes.begin(); it != node->nodes.end(); it++) {
 			XML::XMLNode * conf = *it;
 			const HRESULT hr = LoadXML_ConfigInterface(conf, filter->filter);
-			if (FAILED(hr)) 
+			if (FAILED(hr))
 				return hr;
 		}
 		return S_OK;
@@ -1747,7 +1807,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				if (dll.GetLength() > 0) {		// check for missing cass factory DLL
 					CPath dll_path(dll);
 					while (!dll_path.FileExists()) {
-						CFileDialog dlg(TRUE, _T(".dll"), dll_path, OFN_ENABLESIZING|OFN_FILEMUSTEXIST, 
+						CFileDialog dlg(TRUE, _T(".dll"), dll_path, OFN_ENABLESIZING|OFN_FILEMUSTEXIST,
 							_T("DLL Files|*.dll;*.ax|All Files|*.*|"));
 						dlg.m_ofn.lpstrTitle = _T("Find filter DLL/AX or cancel to use CoCreateInstance");
 						dll = _T("");
@@ -1886,7 +1946,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 			CString guidStr;
 			NameGuid(filter.clsid, guidStr, true);
-			_tprintf(_T("Creating filter %d %s, CLSID %s\n"), filter.index, (LPCTSTR)filter.name, (LPCTSTR)guidStr); 
+			_tprintf(_T("Creating filter %d %s, CLSID %s\n"), filter.index, (LPCTSTR)filter.name, (LPCTSTR)guidStr);
 
 			hr = filter.ibasefilter.CoCreateInstance(filter.clsid, NULL, CLSCTX_INPROC_SERVER);
 
@@ -1903,6 +1963,12 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				// 1: Create filter
 				AddFilter(filter.ibasefilter, filter.name);
 
+#ifdef SEEK_MUXER
+				if (filter.clsid == CLSID_AviDest) {
+					pMuxer = filter.ibasefilter;
+				}
+#endif
+
 				// 2 Set source file
 				if (!filter.source_filename.IsEmpty()) {
 					CComQIPtr<IFileSourceFilter> source(filter.ibasefilter);
@@ -1914,7 +1980,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 						// Give the user a chance to fix up an invalid filename but only check file name for the first time
 						if (INVALID_FILE_ATTRIBUTES == file_attributes)
 							hr = E_INVALIDARG;
-						else 
+						else
 							hr = source->Load(filter.source_filename, NULL);
 
 						while (FAILED(hr)) {
@@ -1929,7 +1995,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				if (!filter.sink_filename.IsEmpty()) {
 					CComQIPtr<IFileSinkFilter> sink(filter.ibasefilter);
 					if (sink) {
-						_tprintf(_T("  Setting sink file %s\n"), (LPCTSTR)filter.sink_filename); 
+						_tprintf(_T("  Setting sink file %s\n"), (LPCTSTR)filter.sink_filename);
 
 						// Give the user a chance to fix up an invalid destination path
 						CPath path(filter.sink_filename);
@@ -1947,7 +2013,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 				// 4 Load filter configuration
 				if (!filter.ipersiststream_data.IsEmpty()) {
-					_tprintf(_T("  Loading state\n")); 
+					_tprintf(_T("  Loading state\n"));
 
 					bool success = false;
 
@@ -1961,7 +2027,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 						CComQIPtr<IPersistStream> ps(filter.ibasefilter);
 						if (ps) {
 							hr = ps->Load(stream);
-							success = SUCCEEDED(hr); 
+							success = SUCCEEDED(hr);
 						}
 					}
 					if (!success) {
@@ -1973,16 +2039,16 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				}
 			}
 		}
-		
+
 		// 5 Connect pins
 		for (int i=0; i<grf.grf_connections.GetCount(); i++) {
 			const GRF_Connection& connection = grf.grf_connections[i];
 
 			RefreshFilters();
 
-			_tprintf(_T("Connecting filter %d pin %s to filter %d pin %s\n"), 
-					connection.output_filter_index, (LPCTSTR)connection.output_pin_id, 
-					connection.input_filter_index, (LPCTSTR)connection.input_pin_id); 
+			_tprintf(_T("Connecting filter %d pin %s to filter %d pin %s\n"),
+					connection.output_filter_index, (LPCTSTR)connection.output_pin_id,
+					connection.input_filter_index, (LPCTSTR)connection.input_pin_id);
 
 			Filter* out_filter = NULL;
 			if (connection.output_filter_index > 0 && connection.output_filter_index <= grf.grf_filters.GetCount())	// 1-based indices
@@ -2014,7 +2080,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 					if (1 == _stscanf(connection.output_pin_id, _T("Output%d"), &pin_index)) {	// If ID of form Output<integer>
 						while (!out_pin && --pin_index >= 0) {									// Look backwards for pins of ID Output<integer>
 							CString pin_id;
-							pin_id.Format(_T("Output%d"), pin_index);							
+							pin_id.Format(_T("Output%d"), pin_index);
 
 							out_pin = out_filter->FindPinByID(pin_id);
 							if (!out_pin || out_pin->connected || out_pin->dir == PINDIR_INPUT) {
@@ -2028,7 +2094,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 				if (!out_pin) {
 					CString errorStr;
-					errorStr.Format(_T("Can't find output pin ID %s for filter %d %s"), 
+					errorStr.Format(_T("Can't find output pin ID %s for filter %d %s"),
 							(LPCTSTR)connection.output_pin_id,
 							connection.output_filter_index,
 							(LPCTSTR)out_filter->display_name);
@@ -2036,7 +2102,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 					DSUtil::ShowError(E_FAIL, errorStr);
 				} else if (!in_pin) {
 					CString errorStr;
-					errorStr.Format(_T("Can't find input pin ID %s for filter %d %s"), 
+					errorStr.Format(_T("Can't find input pin ID %s for filter %d %s"),
 							(LPCTSTR)connection.input_pin_id,
 							connection.input_filter_index,
 							(LPCTSTR)in_filter->display_name);
@@ -2049,7 +2115,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 					if (FAILED(hr)) {
 						CString errorStr;
-						errorStr.Format(_T("Connecting %s/%s to %s/%s"), 
+						errorStr.Format(_T("Connecting %s/%s to %s/%s"),
 								(LPCTSTR)out_filter->display_name,
 								(LPCTSTR)connection.output_pin_id,
 								(LPCTSTR)in_filter->display_name,
@@ -2094,7 +2160,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 			CComPtr<IStorage> pStorage;
 			hr = StgOpenStorage(fn, 0, STGM_TRANSACTED | STGM_READ | STGM_SHARE_DENY_WRITE, 0, 0, &pStorage);
-			if (FAILED(hr)) 
+			if (FAILED(hr))
 				return hr;
 
 			CComQIPtr<IPersistStream> pPersistStream(gb);
@@ -2106,6 +2172,27 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				if (SUCCEEDED(hr)) {
 					hr = pPersistStream->Load(pStream);
 				}
+
+#ifdef SEEK_MUXER
+				pMuxer = NULL;
+				if (gb) {
+					CComPtr<IEnumFilters> enum_filters;
+					CComPtr<IBaseFilter> ifilter;
+					CLSID clsid;
+					hr = gb->EnumFilters(&enum_filters);
+					if (SUCCEEDED(hr) && enum_filters) {
+						enum_filters->Reset();
+						ULONG ff = 0;
+						while (enum_filters->Next(1, &ifilter, &ff) == NOERROR) {
+							ifilter->GetClassID(&clsid);
+							if (clsid == CLSID_AviDest) {
+								pMuxer = ifilter;
+							}
+						}
+					}
+				}
+#endif
+
 			}
 		}
 
@@ -2117,9 +2204,9 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 	int DisplayGraph::SaveGRF(CString fn)
 	{
-		const WCHAR wszStreamName[] = L"ActiveMovieGraph"; 
+		const WCHAR wszStreamName[] = L"ActiveMovieGraph";
 		HRESULT hr;
-		    
+
 		IStorage *pStorage = NULL;
 		hr = StgCreateDocfile(fn, STGM_CREATE | STGM_TRANSACTED | STGM_READWRITE | STGM_SHARE_EXCLUSIVE, 0, &pStorage);
 		if (FAILED(hr)) return hr;
@@ -2127,7 +2214,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		IStream *pStream;
 		hr = pStorage->CreateStream(wszStreamName, STGM_WRITE | STGM_CREATE | STGM_SHARE_EXCLUSIVE,	0, 0, &pStream);
 		if (FAILED(hr)) {
-			pStorage->Release();    
+			pStorage->Release();
 			return hr;
 		}
 
@@ -2151,16 +2238,16 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		do {
 			params->MarkRender(true);
 			if (!gb) {
-				hr = E_POINTER;	
+				hr = E_POINTER;
 				break;
 			}
 			hr = gb->RenderFile(fn, NULL);
 			params->MarkRender(false);
-			if (callback) 
+			if (callback)
 				callback->OnRenderFinished();
 
 		} while (0);
-		
+
 		Dirty();
 
 		return hr;
@@ -2171,7 +2258,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		// find the filter
 		CString	filter_name = DSUtil::get_next_token(pin_path, _T("/"));
 		Filter * const filter = FindFilter(filter_name);
-		if (!filter) 
+		if (!filter)
 			return NULL;
 
 		// try to find the pin
@@ -2198,14 +2285,14 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				return filt;
 			}
 		}
-		return NULL;		
+		return NULL;
 	}
 
 	void DisplayGraph::DeleteAllFilters()
 	{
 		for (int i=filters.GetCount()-1; i>=0; i--) {
 			Filter *filt = filters[i];
-			if (callback) 
+			if (callback)
 				callback->OnFilterRemoved(this, filt);
 			delete filt;
 		}
@@ -2218,7 +2305,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 		if (!p1 || !p1->ipin)
 			hr = E_POINTER;
-		else if (!p1->peer) 
+		else if (!p1->peer)
 			hr = VFW_E_NOT_CONNECTED;
 		else {
 			Pin * const p2 = p1->peer;
@@ -2233,8 +2320,8 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 			if (SUCCEEDED(hr)) {
 				params->MarkRender(true);
-				hr = DSUtil::ConnectPin(gb, p1->ipin, p2->ipin, 
-							params->connect_mode != RenderParameters::ConnectMode_Intelligent, 
+				hr = DSUtil::ConnectPin(gb, p1->ipin, p2->ipin,
+							params->connect_mode != RenderParameters::ConnectMode_Intelligent,
 							params->connect_mode == RenderParameters::ConnectMode_DirectWithMT,
 							&mediaType);
 				params->MarkRender(false);
@@ -2260,12 +2347,12 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 		params->MarkRender(true);
 		HRESULT hr = DSUtil::ConnectPin(gb, p1->ipin, p2->ipin,
-					params->connect_mode != RenderParameters::ConnectMode_Intelligent, 
+					params->connect_mode != RenderParameters::ConnectMode_Intelligent,
 					params->connect_mode == RenderParameters::ConnectMode_DirectWithMT);
 		params->MarkRender(false);
 		if (callback)
 			callback->OnRenderFinished();
-		
+
         if (hr == S_OK) {
 		    RefreshFilters();
 			SmartPlacement(false);
@@ -2286,7 +2373,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		const int border = Filter::SELECTION_BORDER;
 		for (int i=0; i<filters.GetCount(); i++) {
 			Filter *filter = filters[i];
-			CRect	rc(filter->posx-border, filter->posy-2, 
+			CRect	rc(filter->posx-border, filter->posy-2,
 					   filter->posx + filter->width+border, filter->posy + filter->height+2);
 			if (rc.PtInRect(pt)) return filter;
 		}
@@ -2313,7 +2400,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				enum_filters->Reset();
 				ULONG ff = 0;
 				while (enum_filters->Next(1, &ifilter, &ff) == NOERROR) {
-		
+
 					Filter	* filter = NULL;
 
 					// Find matching existing Filter if any and delete from stale list
@@ -2334,6 +2421,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 					// add Filter back to main list in same order as enumerated
 					filters.Add(filter);
+
 					ifilter.Release();
 				}
 			}
@@ -2342,7 +2430,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		// Remaining Filters in stale list are not in graph so need to be deleted
 		for (int i=0; i<stale_filters.GetCount(); i++) {
 			Filter * const f = stale_filters[i];
-			if (callback) 
+			if (callback)
 				callback->OnFilterRemoved(this, f);
 			delete f;
 			// no need to clear list as it's not used below
@@ -2480,7 +2568,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				hr = CoCreateInstance(selectedFilter->clsid, NULL, CLSCTX_INPROC_SERVER, IID_IBaseFilter, (void**)&instance);
 			}
 			if (SUCCEEDED(hr)) {
-				
+
 				// now check for a few interfaces
 				int ret = ConfigureInsertedFilter(instance, selectedFilter->name);
 				if (ret < 0) {
@@ -2508,7 +2596,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 					if (selectedFilter->created_from_dll) {
 						GraphStudio::Filter * const f = FindFilter(instance);
 						if (f)
-							f->created_from_dll = true;		
+							f->created_from_dll = true;
 					}
 				}
 				instance = NULL;
@@ -2622,7 +2710,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 	// do some nice automatic filter placement
 	void DisplayGraph::SmartPlacement(bool force /* = true */)
 	{
-		if (params && !params->auto_arrange && !force) {		// if not forced to arrange 
+		if (params && !params->auto_arrange && !force) {		// if not forced to arrange
 			bool new_connected_filter = false;					// search for any new connected filters
 			for (int i=0; i<filters.GetCount() && !new_connected_filter; i++) {
 				const Filter * const filter = filters[i];
@@ -2664,7 +2752,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			}
 
 			// Deal with filters that have multiple inputs to prevent crossing input lines
-			// Find upstream inputs from filters with multiple connected inputs in depth-first, first input pin order 
+			// Find upstream inputs from filters with multiple connected inputs in depth-first, first input pin order
 			CArray<Filter*> input_filters;
 			FindInputFilters(filters, input_filters);
 
@@ -2758,7 +2846,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				filter->posy = y_pos;
 				columns[col].y = NextGridPos(y_pos + filter->height + params->filter_y_gap);	// update y position of bottom of column
 
-				if (col+1 < columns.GetCount()) {		// if current column too narrow reposition all following columns	
+				if (col+1 < columns.GetCount()) {		// if current column too narrow reposition all following columns
 					const int next_filter_x = NextGridPos(columns[col].x + filter->width + params->filter_x_gap);
 
 					if (next_filter_x > columns[col+1].x) {
@@ -3014,7 +3102,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				height = params->min_filter_height;
 			}
 		}
-		if (!filter || !f) 
+		if (!filter || !f)
 			return ;
 
 		// get the filter CLSID
@@ -3027,7 +3115,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 		// load name
 		name = CString(info.achName);
-		if (name == _T("")) 
+		if (name == _T(""))
 			name = _T("(Unnamed filter)");
 
 		display_name = name;
@@ -3220,12 +3308,12 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 						videowindow = NULL;
 					}
 				}
-			}		
+			}
 		}
 
 		//---------------------------------------------------------------------
 		// calculate size
-		//---------------------------------------------------------------------		
+		//---------------------------------------------------------------------
 		if (graph) {
 			const int num_pin_rows = max(input_pins.GetCount(), output_pins.GetCount());
 
@@ -3258,16 +3346,16 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			name_width = rect.Size().cx;
 
 			// add horizontal text border and round up to next grid size
-			width = DisplayGraph::NextGridPos(name_width + params->pin_spacing);	
+			width = DisplayGraph::NextGridPos(name_width + params->pin_spacing);
 			width = max(width, params->min_filter_width);
 
 			// add vertical border for text, space for pins and round up to next grid size
-			height = DisplayGraph::NextGridPos(rect.Size().cy + params->pin_spacing/2 + (num_pin_rows*params->pin_spacing));	
+			height = DisplayGraph::NextGridPos(rect.Size().cy + params->pin_spacing/2 + (num_pin_rows*params->pin_spacing));
 			height = max(height, params->min_filter_height);
 		}
 
 		// we don't need it anymore
-		if (info.pGraph) 
+		if (info.pGraph)
 			info.pGraph->Release();
 	}
 
@@ -3324,6 +3412,12 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		return false;
 	}
 
+	bool Filter::IsMuxer()
+	{
+		return (clsid == CLSID_AviDest);
+	}
+
+
 	void DoDrawArrow(CDC *dc, CPoint p1, CPoint p2, DWORD color, int nPenStyle)
 	{
 		const	int connection_width = 2;
@@ -3371,7 +3465,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 	}
 
 	void Filter::DrawConnections(CDC *dc)
-	{		
+	{
 		// render directed arrows for all connected output pins
 		for (int i=0; i<output_pins.GetCount(); i++) {
 			Pin		*pin = output_pins[i];
@@ -3383,9 +3477,9 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				CPoint	pt1, pt2;
 				pin->GetCenterPoint(&pt1);
 				peer->GetCenterPoint(&pt2);
-				if (pin->selected || pin->peer->selected) 
+				if (pin->selected || pin->peer->selected)
 					color = params->color_select;
-			
+
 				DoDrawArrow(dc, pt1, pt2, color);
 			}
 		}
@@ -3431,13 +3525,13 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		dc->SelectObject(&pen_light);
 		dc->MoveTo(posx, posy+height-2);		dc->LineTo(posx, posy);		dc->LineTo(posx+width-1, posy);
 		dc->MoveTo(posx+1, posy+height-3);	dc->LineTo(posx+1, posy+1);	dc->LineTo(posx+width-2, posy+1);
-		dc->MoveTo(posx+width-4, posy+4);	
+		dc->MoveTo(posx+width-4, posy+4);
 		dc->LineTo(posx+width-4, posy+height-4);	dc->LineTo(posx+3, posy+height-4);
 
 		dc->SelectObject(&pen_dark);
 		dc->MoveTo(posx+0, posy+height-1);	dc->LineTo(posx+width-1, posy+height-1);	dc->LineTo(posx+width-1, posy-1);
 		dc->MoveTo(posx+1, posy+height-2);	dc->LineTo(posx+width-2, posy+height-2);	dc->LineTo(posx+width-2, posy);
-		dc->MoveTo(posx+3, posy+height-4);	
+		dc->MoveTo(posx+3, posy+height-4);
 		dc->LineTo(posx+3, posy+3);	dc->LineTo(posx+width-3, posy+3);
 
 		//---------------------------------------------------------------------
@@ -3494,9 +3588,9 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 				} else {
 					tmp_dc.SelectObject(icon->icon_normal[icon->state]);
 				}
-	
-				const DWORD	transpColor = tmp_dc.GetPixel(0, 0);		
-				dc->TransparentBlt(ox, oy, OVERLAY_ICON_WIDTH, OVERLAY_ICON_HEIGHT, &tmp_dc, 
+
+				const DWORD	transpColor = tmp_dc.GetPixel(0, 0);
+				dc->TransparentBlt(ox, oy, OVERLAY_ICON_WIDTH, OVERLAY_ICON_HEIGHT, &tmp_dc,
 						0, 0, OVERLAY_ICON_WIDTH, OVERLAY_ICON_HEIGHT, transpColor);
 			}
 			tmp_dc.DeleteDC();
@@ -3531,7 +3625,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		}
 
 		// we distribute new values, if they are larger
-		// If we're adding to column zero, 
+		// If we're adding to column zero,
 		// OR this filter has been added to column for first time or pushed into a later column than it was already
 		// OR this filter's position is further right than the current column
 		if (new_column == 0 || new_column > column || x > graph->columns[new_column].x) {
@@ -3571,7 +3665,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			for (int i=0; i<output_pins.GetCount(); i++) {
 				Pin *pin = output_pins[i];
 				IPin *peer_pin = NULL;
-				if (pin && pin->ipin) 
+				if (pin && pin->ipin)
 					pin->ipin->ConnectedTo(&peer_pin);
 
 				if (peer_pin) {
@@ -3636,16 +3730,16 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 	Pin * Filter::FirstUnconnectedInputPin()
 	{
-		for (int i=0; i<input_pins.GetCount(); i++)	
-			if (!input_pins[i]->connected)	
+		for (int i=0; i<input_pins.GetCount(); i++)
+			if (!input_pins[i]->connected)
 				return input_pins[i];
 		return NULL;
 	}
 
 	Pin * Filter::FirstUnconnectedOutputPin()
 	{
-		for (int i=0; i<output_pins.GetCount(); i++)	
-			if (!output_pins[i]->connected)	
+		for (int i=0; i<output_pins.GetCount(); i++)
+			if (!output_pins[i]->connected)
 				return output_pins[i];
 		return NULL;
 	}
@@ -3683,7 +3777,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		for (CArray<Pin*> ** pins = lists; pins<lists+num_lists; pins++) {
 			for (int p=0; p<(**pins).GetCount(); p++) {
 				Pin * const pin = (**pins)[p];
-				if (pin->id == pin_id) 
+				if (pin->id == pin_id)
 					return pin;
 			}
 		}
@@ -3702,7 +3796,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		for (CArray<Pin*> ** pins = lists; pins<lists+num_lists; pins++) {
 			for (int p=0; p<(**pins).GetCount(); p++) {
 				Pin * const pin = (**pins)[p];
-				if (pin->ipin == ppin) 
+				if (pin->ipin == ppin)
 					return pin;
 			}
 		}
@@ -3717,7 +3811,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		for (CArray<Pin*> ** pins = lists; pins<lists+num_lists; pins++) {
 			for (int p=0; p<(**pins).GetCount(); p++) {
 				Pin * const pin = (**pins)[p];
-				if (pin->name == name) 
+				if (pin->name == name)
 					return pin;
 			}
 		}
@@ -3735,7 +3829,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			pin->GetCenterPoint(&cp);
 
 			float	dist = (float)sqrt((float)((p.x-cp.x)*(p.x-cp.x) + (p.y-cp.y)*(p.y-cp.y)));
-			if (dist <= SELECTION_BORDER) 
+			if (dist <= SELECTION_BORDER)
 				return pin;
 		}
 		for (i=0; i<input_pins.GetCount(); i++) {
@@ -3746,7 +3840,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			pin->GetCenterPoint(&cp);
 
 			float	dist = (float)sqrt((float)((p.x-cp.x)*(p.x-cp.x) + (p.y-cp.y)*(p.y-cp.y)));
-			if (dist <= SELECTION_BORDER) 
+			if (dist <= SELECTION_BORDER)
 				return pin;
 		}
 		return NULL;
@@ -3767,7 +3861,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 	{
 		ReleaseIcons();
 		if (!params) return ;
-		
+
 		// reference clock ?
 		if (clock) {
 			OverlayIcon *icon = new OverlayIcon(this, OverlayIcon::ICON_CLOCK);
@@ -3779,7 +3873,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			overlay_icons.Add(icon);
 		}
 
-		// filter supports basic audio 
+		// filter supports basic audio
 		if (basic_audio) {
 
 			OverlayIcon	*icon = new OverlayIcon(this, OverlayIcon::ICON_VOLUME);
@@ -3864,16 +3958,16 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 	int Pin::Disconnect()
 	{
-		if (!connected || !peer) 
+		if (!connected || !peer)
 			return S_OK;
 
 		// we need to disconnect both pins
 		HRESULT hr = filter->graph->gb->Disconnect(peer->ipin);
-		if (FAILED(hr)) 
+		if (FAILED(hr))
 			return hr;
 
 		hr = filter->graph->gb->Disconnect(ipin);
-		if (FAILED(hr)) 
+		if (FAILED(hr))
 			return hr;
 
 		// clear variables
@@ -3936,7 +4030,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		IPin *peerpin = NULL;
 		ppin->ConnectedTo(&peerpin);
 		connected = (peerpin != NULL);
-		if (peerpin) 
+		if (peerpin)
 			peerpin->Release();
 
 		PIN_INFO	info;
@@ -3946,7 +4040,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 
 		// find out name
 		name = CString(info.achName);
-		if (info.pFilter) 
+		if (info.pFilter)
 			info.pFilter->Release();
 
 		LPOLESTR idStr = NULL;
@@ -3997,7 +4091,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 					if (avTimePerFrame > 0LL && avTimePerFrame < filter->graph->min_time_per_frame)
 						filter->graph->min_time_per_frame = avTimePerFrame;
 				}
-			} 
+			}
         }
 
 		return 0;
@@ -4072,10 +4166,10 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			dc->MoveTo(x+1, y);		dc->LineTo(x+1 + pinsize, y);
 			dc->MoveTo(x, y+1);		dc->LineTo(x+pinsize,	  y+1);
 			dc->SelectObject(&pen_dark);
-			dc->MoveTo(x, y+2+pinsize+1);		
+			dc->MoveTo(x, y+2+pinsize+1);
 			dc->LineTo(x+1+pinsize, y+2+pinsize+1);
 			dc->LineTo(x+1+pinsize, y-1);
-			dc->MoveTo(x, y+2+pinsize);			
+			dc->MoveTo(x, y+2+pinsize);
 			dc->LineTo(x+1+pinsize-1, y+2+pinsize);
 			dc->LineTo(x+1+pinsize-1, y);
 
@@ -4210,7 +4304,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		}
 
 		bool timeout = false;
-		
+
 		if (graph->params->abort_timeout && graph->params->in_render) {
 
 			ULONGLONG		timenow = DSUtil::GetTickCount64();
@@ -4218,7 +4312,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			if (graph->params->render_can_proceed &&
 				(timenow > (graph->params->render_start_time + 10*1000))
 				) {
-	
+
 				// TODO: perhaps display some error message
 				graph->params->render_can_proceed = false;
 				timeout = true;
@@ -4229,7 +4323,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 		/**********************************************************************
 			List of filters used in a render operation
 		***********************************************************************/
-		
+
 		bool filter_blacklisted = false;
 		RenderAction	ra;
 
@@ -4283,7 +4377,7 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 					if (name == graph->params->preferred_video_renderer) return NOERROR;
 
 					// if it's in the list of renderers, we will ignore this filter
-					if (graph->params->video_renderers) {						
+					if (graph->params->video_renderers) {
 						for (int i=0; i<graph->params->video_renderers->filters.GetCount(); i++) {
 							DSUtil::FilterTemplate	&filter = graph->params->video_renderers->filters[i];
 							if (filter.moniker_name == name) {

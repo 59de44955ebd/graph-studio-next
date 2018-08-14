@@ -164,8 +164,9 @@ GRAPHSTUDIO_NAMESPACE_START			// cf stdafx.h for explanation
 			} else {
 				// Give the user a chance to fix up an invalid destination path
 				CString filename = conf->GetValue(_T("dest"));
-				CPath path(filename);
-				if (!path.RemoveFileSpec() || GetFileAttributes(path) == INVALID_FILE_ATTRIBUTES) {
+				CPath path(filename);		
+				
+				if (!path.RemoveFileSpec()) { // removed by VS: || GetFileAttributes(filename) == INVALID_FILE_ATTRIBUTES
 					CFileSinkForm form(_T("Missing destination file"));
 					do {
 						form.result_file = filename;

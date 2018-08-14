@@ -50,11 +50,14 @@
     <Filter Include="Filters\filter_video_analyzer">
       <UniqueIdentifier>{72cfcfa2-271e-41a6-a860-6502e7d3481b}</UniqueIdentifier>
     </Filter>
-	<Filter Include="Filters\filter_h264_analyzer">
+    <Filter Include="Filters\filter_h264_analyzer">
       <UniqueIdentifier>{beb37750-0515-42b1-9f9c-643c0b54ec3a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Filters\filter_dxva_null">
       <UniqueIdentifier>{cd5c7e70-5bfb-458c-86da-9a338cb20f5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code Generators">
+      <UniqueIdentifier>{66729f34-adda-4fc8-a0cf-3a7cc94862e2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -387,7 +390,7 @@
     <ClInclude Include="src\H264StructReader.h">
       <Filter>Utils</Filter>
     </ClInclude>
-	<ClInclude Include="src\filters\h264_analyzer\filter_h264_analyzer.h">
+    <ClInclude Include="src\filters\h264_analyzer\filter_h264_analyzer.h">
       <Filter>Filters\filter_h264_analyzer</Filter>
     </ClInclude>
     <ClInclude Include="src\filters\h264_analyzer\h264_analyzer.h">
@@ -396,7 +399,7 @@
     <ClInclude Include="src\filters\dxva_null\filter_dxva_null.h">
       <Filter>Filters\filter_dxva_null</Filter>
     </ClInclude>
-	<ClInclude Include="src\DbgLogConfigForm.h">
+    <ClInclude Include="src\DbgLogConfigForm.h">
       <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="src\DbgLogPage.h">
@@ -413,6 +416,16 @@
     </ClInclude>
     <ClInclude Include="src\ComDllAnalyzerForm.h">
       <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FilterReportGenerator.h" />
+    <ClInclude Include="src\CodeForm.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\code_gen\GraphCode.h">
+      <Filter>Code Generators</Filter>
+    </ClInclude>
+    <ClInclude Include="src\code_gen\GraphCodeCommon.h">
+      <Filter>Code Generators</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -665,7 +678,7 @@
     <ClCompile Include="src\H264StructReader.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-	<ClCompile Include="src\filters\h264_analyzer\filter_h264_analyzer.cpp">
+    <ClCompile Include="src\filters\h264_analyzer\filter_h264_analyzer.cpp">
       <Filter>Filters\filter_h264_analyzer</Filter>
     </ClCompile>
     <ClCompile Include="src\filters\h264_analyzer\h264_analyzer.cpp">
@@ -692,6 +705,28 @@
     <ClCompile Include="src\ComDllAnalyzerForm.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="src\FilterReportGenerator.cpp" />
+    <ClCompile Include="src\GraphReportGenerator.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CodeForm.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\code_gen\GraphCodeBAT.cpp">
+      <Filter>Code Generators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\code_gen\GraphCodeCommon.cpp">
+      <Filter>Code Generators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\code_gen\GraphCodeCPP.cpp">
+      <Filter>Code Generators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\code_gen\GraphCodeLUA.cpp">
+      <Filter>Code Generators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\code_gen\GraphCodeCSharp.cpp">
+      <Filter>Code Generators</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="src\filters\analyzer\analyzer.idl">
@@ -706,7 +741,7 @@
     <Midl Include="src\filters\dump\dump.idl">
       <Filter>Filters\filter_dump</Filter>
     </Midl>
-	<Midl Include="src\filters\dxva_null\dxva_null.idl">
+    <Midl Include="src\filters\dxva_null\dxva_null.idl">
       <Filter>Filters\filter_dxva_null</Filter>
     </Midl>
   </ItemGroup>

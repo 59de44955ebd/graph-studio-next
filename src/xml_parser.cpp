@@ -124,11 +124,13 @@ namespace XML
 	}
 	
 	
-	XMLNode::XMLNode() :
+	XMLNode::XMLNode(WCHAR * folder) :
 		ValueList(),
 		name(""),
 		depth(0)
 	{
+		if (folder) wcscpy(m_folder, folder);
+		else m_folder[0] = 0;
 	}
 
 	XMLNode::~XMLNode()
@@ -209,7 +211,7 @@ namespace XML
 	}
 
 	HRESULT XMLFile::LoadFromFile(CString fn)
-	{
+	{		
 		root->Clear();
 
 		CComPtr<IXmlReader>		reader;
@@ -311,6 +313,8 @@ namespace XML
 		use_depth = true;
 		offset_string = _T("");
 		Clear();
+		
+		wcscpy(m_folder, L"");
 	}
 
 	XMLWriter::~XMLWriter()

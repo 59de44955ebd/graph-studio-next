@@ -80,8 +80,12 @@ namespace XML
 		CString			name;
 		int				depth;
 		XMLList			nodes;
+
+		// NEW
+		WCHAR m_folder[MAX_PATH] = L"";
+
 	public:
-		XMLNode();
+		XMLNode(WCHAR * folder = L"");
 		virtual ~XMLNode();
 
 		void AddNode(XMLNode *node);
@@ -108,6 +112,7 @@ namespace XML
 		int					depth;
 		bool				use_depth;
 		CString				offset_string;
+		WCHAR               m_folder[MAX_PATH]; // NEW
 
 		void PrepareOffset();
 	public:
@@ -134,6 +139,7 @@ namespace XML
 	public:
 		XMLNode				*root;
 		CString				version;
+
 	public:
 		XMLFile();
 		virtual ~XMLFile();
@@ -146,11 +152,3 @@ namespace XML
 
 
 };
-
-
-
-
-
-
-
-

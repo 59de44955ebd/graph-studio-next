@@ -153,6 +153,7 @@ BEGIN_MESSAGE_MAP(CGraphView, GraphStudio::DisplayView)
 	ON_COMMAND(ID_LIST_MRU_CLEAR, &CGraphView::OnClearMRUClick)
 	ON_COMMAND(ID_GRAPH_MAKEGRAPHINFORMATION, &CGraphView::OnSaveGraphInformation)
 	ON_COMMAND(ID_GRAPH_MAKEGRAPHSCREENSHOT, &CGraphView::OnGraphScreenshot)
+	ON_COMMAND(ID_FILE_GENERATECODE, &CGraphView::OnGenerateCode)
 	ON_COMMAND(ID_GRAPH_USECLOCK, &CGraphView::OnUseClock)
 	ON_COMMAND(ID_SEEK_BACKWARD_1, &CGraphView::OnSeekBackward1)
 	ON_COMMAND(ID_SEEK_BACKWARD_2, &CGraphView::OnSeekBackward2)
@@ -568,7 +569,12 @@ void CGraphView::OnInit()
 	form_textinfo = new CTextInfoForm(this);
 	form_textinfo->view = this;
     form_textinfo->DoCreateDialog(this);
-
+    
+    //test
+	form_gencode = new CCodeForm(this);
+	form_gencode->view = this;
+    form_gencode->DoCreateDialog(this);
+    
 	form_progress = new CProgressForm(this);
 	form_progress->view = this;
 	form_progress->Create(IDD_DIALOG_PROGRESS, this);
@@ -1038,18 +1044,23 @@ HRESULT CGraphView::DoFileSave()
 	HRESULT hr = S_OK;
 	if (CgraphstudioApp::g_SaveXmlAndGrf) {				// Save both GRF and GRFX, modify extension where needed
 		CPath grf_name = document_filename;
+
 		if (document_type != GRF)
 			grf_name.RenameExtension(_T(".grf"));
+
 		hr = graph.SaveGRF(grf_name);
 		DSUtil::ShowError(hr, _T("Can't save GRF file"));
 
 		CPath xml_name = document_filename;
+
 		if (document_type != XML)
-			xml_name.RenameExtension(_T(".grfx"));
+			xml_name.RenameExtension(_T(".gml"));
+
 		hr = graph.SaveXML(xml_name);
-		DSUtil::ShowError(hr, _T("Can't save GRFX file"));
+		DSUtil::ShowError(hr, _T("Can't save GML file"));
 
 	} else {
+
 		switch (document_type) {
 		case GRF:
 			hr = graph.SaveGRF(document_filename);
@@ -1120,9 +1131,9 @@ HRESULT CGraphView::FileSaveAs(DocumentType input_type)
 	// nabrowsujeme subor
 	// NB references to indices below
 	CString		filter;
-	filter =    _T("GraphStudio XML Files|*.grfx|");
+	filter =    _T("GraphStudio XML Files|*.gml;*.grfx;*.xml|");
 	filter +=	_T("GraphEdit Files|*.grf|");
-	filter +=	_T("All Graph Files|*.grf;*.grfx|");
+	filter +=	_T("All Graph Files|*.gml;*.grfx;*.xml;*.grf|");
 	filter +=	_T("All Files|*.*|");
 
 	CFileDialog dlg(FALSE,NULL,NULL,OFN_OVERWRITEPROMPT|OFN_ENABLESIZING|OFN_PATHMUSTEXIST,filter);
@@ -1151,7 +1162,9 @@ HRESULT CGraphView::FileSaveAs(DocumentType input_type)
 			// If GRF extension, save as GRF
 			document_type = GRF;
 		}
-		else if (output_extension.CompareNoCase(_T(".xml")) == 0 || output_extension.CompareNoCase(_T(".grfx")) == 0) {
+		else if (output_extension.CompareNoCase(_T(".xml")) == 0 || 
+			output_extension.CompareNoCase(_T(".gml")) == 0 ||
+			output_extension.CompareNoCase(_T(".grfx")) == 0) {
 			// If XML extension, save as XML
 			document_type = XML;
 		} else if (output_extension.IsEmpty()) {
@@ -1165,7 +1178,7 @@ HRESULT CGraphView::FileSaveAs(DocumentType input_type)
 		// add file exension if none
 		if (output_extension.IsEmpty()) {
 			if (XML == document_type)
-				output_path.AddExtension(_T(".grfx"));
+				output_path.AddExtension(_T(".gml"));
 			else
 				output_path.AddExtension(_T(".grf"));
 		}
@@ -1210,11 +1223,14 @@ HRESULT CGraphView::TryOpenFile(const CString& file_to_open, bool render_media_f
 		if (ext == _T(".grf")) {
 			save_as = GRF;
 			hr = graph.LoadGRF(fn);
-		} else if ((ext == _T(".grfx") || ext == _T(".xml"))) {
+			
+		} else if (ext == _T(".gml") || ext == _T(".grfx") || ext == _T(".xml")) {
 			save_as = XML;
 			hr = graph.LoadXML(fn);
+			
 		} else if ((ext == _T(".dll") || ext == _T(".ax"))) {
 			hr = InsertFilterFromDLL(fn);
+			
 		} else {
 			hr = graph.RenderFile(fn);
 
@@ -1269,8 +1285,9 @@ CString CGraphView::PromptForFileToOpen(bool media_file)
 	filter +=	_T("All Files|*.*|");
 
 	if (!media_file) {
-		filter +=	_T("All Graph Files|*.grf;*.grfx;*.xml|");
+		filter +=	_T("All Graph Files|*.grf;*.gml;*.grfx;*.xml|");
 		filter +=	_T("GraphEdit Files (grf)|*.grf|");
+		filter +=	_T("GML Files|*.gml|");
 		filter +=	_T("GraphStudio XML Files|*.grfx;*.xml|");
 	}
 
@@ -3223,4 +3240,35 @@ void CGraphView::OnUpdatePlayFullscreenmode(CCmdUI *pCmdUI)
 void CGraphView::OnUpdateStatusClock(CCmdUI* pCmdUI)
 {
 	pCmdUI->SetText(graph.clock_status_text);
+}
+
+
+void CGraphView::OnGenerateCode()
+{
+	//std::string code;
+	//HRESULT hr = getGraphCode(graph.gb, &code);
+	//
+	//if (SUCCEEDED(hr)){
+	//	//WCHAR * code = L"AAA";
+	//
+	//	//CA2W szwCode(code.c_str());
+	//	  
+	//   // pszA works like an LPCSTR, and can be used thus:
+	//   //ExampleFunctionA(pszA);  
+	//
+	//	CCodeForm dlg(code);
+	//    dlg.DoModal();
+	//}
+    
+	if (!form_gencode) {
+		form_gencode = new CCodeForm(this);
+		form_gencode->DoCreateDialog(this);
+		form_gencode->view = this;
+	}
+	form_gencode->ShowWindow(SW_SHOW);
+	form_gencode->SetActiveWindow();
+
+	form_gencode->OnRefresh();
+
+	//dlg.ShowCode(L"XXX\nYYY\nZZZ");
 }

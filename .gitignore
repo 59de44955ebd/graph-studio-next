@@ -1,11 +1,7 @@
 # Build results
-/Debug
-/Debug64
-/Release
-/Release64
-/bin
+obj/
 
-#MIDL output
+# MIDL output
 *_dlldata.c
 *_p.c
 *_i.c
@@ -28,3 +24,8 @@ ipch/
 *.cachefile
 *.VC.db
 *.VC.VC.opendb
+
+# Other
+/.vs
+*.ilk
+*.pdb

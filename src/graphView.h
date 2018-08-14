@@ -44,6 +44,7 @@ public:
     CLookupForm                 *form_hresultlookup;
     CFileTypesForm              *form_filetypes;
 	CComDllAnalyzerForm			*form_comdllanalyzer;
+	CCodeForm                   *form_gencode; // NEW
 
     CCustomToolTipCtrl	        m_ToolTip;
     CPoint                      m_lastToolTipPoint;
@@ -351,6 +352,8 @@ public:
 	afx_msg void OnPlayFullscreenmode();
 	afx_msg void OnUpdatePlayFullscreenmode(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateStatusClock(CCmdUI* pCmdUI);
+
+	void OnGenerateCode();
 };
 
 #ifndef _DEBUG  // debug version in graphView.cpp

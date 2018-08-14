@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by graphstudionext.rc
+// Von Microsoft Visual C++ generierte Includedatei.
+// Verwendet durch graphstudionext.rc
 //
 #define IDC_BUTTON_SET_PREROLL          3
 #define IDD_ABOUTBOX                    100
@@ -460,13 +460,16 @@
 #define ID_BUTTON_LOOP                  32959
 #define ID_OPTIONS_RESERVELOWMEMORY     32960
 #define ID_HELP_COMDLLANALYZER          32963
-
+#define ID_FILE_GENERATECODE            32964
+#define IDD_DIALOG_CODE                 32965
+#define IDC_EDIT_CODE                   32966
+#define IDC_COMBO_LANG                  32967
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        185
-#define _APS_NEXT_COMMAND_VALUE         32964
+#define _APS_NEXT_COMMAND_VALUE         32965
 #define _APS_NEXT_CONTROL_VALUE         1176
 #define _APS_NEXT_SYMED_VALUE           108
 #endif
