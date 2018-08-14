@@ -2,7 +2,7 @@
 
 [GraphStudioNext](https://github.com/cplussharp/graph-studio-next) is a DirectShow graph editor. It's an open source alternative to [Microsoft Graph Edit](https://msdn.microsoft.com/en-us/library/windows/desktop/dd407274.aspx) in the [Windows SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk) with many additional features.
 
-[GraphStudioNext-Enhanced](https://github.com/59de44955ebd/graph-studio-next-enhanced) is a fork of GraphStudioNext that adds the following enhancements:
+[GraphStudioNext-Enhanced](https://github.com/59de44955ebd/graph-studio-next-enhanced) is a fork of GraphStudioNext that adds the following enhancements (still work in progress and propably having bugs):
 
 **1. Code Generation**
 
@@ -18,7 +18,7 @@
 
 **3. Accurate progress info when transcoding**
 
-   When transcoding to AVI, the AVI Muxer's IMediaSeek interface is used for the seek bar/progress info, so also when transcoding the seek bar's state is accurate.
+   When transcoding to AVI, the AVI Muxer's IMediaSeek interface is used for the seek bar/progress info, so the seek bar's state is accurate also when transcoding.
 
 **Screenshots**
 
