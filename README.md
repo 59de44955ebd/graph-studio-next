@@ -18,16 +18,20 @@
 
 3. When transcoding to AVI, the AVI Muxer's IMediaSeek interface is used for the seek bar/progress info, so also when transcoding the seek bar's state is accurate.
 
-*Screenshots*
+## Screenshots
 
-A filter graph exported as Windows batch script (BAT):
-![](screenshots/bbb_spout_ndi_BAT.png)
+* A filter graph exported as Windows batch script (BAT):
 
-A filter graph exported as C# code:
-![](screenshots/bbb_spout_ndi_CSharp.png)
+  ![](screenshots/bbb_spout_ndi_BAT.png)
 
-A filter graph exported as C++ code:
-![](screenshots/bbb_spout_ndi_CPP.png)
+* A filter graph exported as C# code:
 
-A filter graph exported as Lua (LuaJIT) code:
-![](screenshots/bbb_spout_ndi_LUA.png)
+  ![](screenshots/bbb_spout_ndi_CSharp.png)
+
+* A filter graph exported as C++ code:
+
+  ![](screenshots/bbb_spout_ndi_CPP.png)
+
+* A filter graph exported as Lua (LuaJIT) code:
+
+  ![](screenshots/bbb_spout_ndi_LUA.png)
