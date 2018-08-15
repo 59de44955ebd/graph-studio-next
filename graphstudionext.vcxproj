@@ -367,7 +367,8 @@
     <ClCompile Include="src\code_gen\GraphCodeCSharp.cpp" />
     <ClCompile Include="src\code_gen\GraphCodeCommon.cpp" />
     <ClCompile Include="src\code_gen\GraphCodeCPP.cpp" />
-    <ClCompile Include="src\code_gen\GraphCodeLUA.cpp" />
+    <ClCompile Include="src\code_gen\GraphCodeLua.cpp" />
+    <ClCompile Include="src\code_gen\GraphCodePython.cpp" />
     <ClCompile Include="src\ComDllAnalyzer.cpp" />
     <ClCompile Include="src\ComDllAnalyzerForm.cpp" />
     <ClCompile Include="src\Crc32.cpp" />

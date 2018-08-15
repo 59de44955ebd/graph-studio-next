@@ -27,7 +27,8 @@ LPCTSTR	LangNames[] =
 	_T("BAT"),
 	_T("C++"),
 	_T("C#"),
-	_T("Lua")
+	_T("Lua"),
+	_T("Python")
 };
 int LangNamesCount = sizeof(LangNames)/sizeof(LangNames[0]);
 
@@ -148,7 +149,10 @@ void CCodeForm::OnRefresh()
 			hr = getGraphCodeCSharp(view->graph.gb, &code);
 			break;
 		case 3:
-			hr = getGraphCodeLUA(view->graph.gb, &code);
+			hr = getGraphCodeLua(view->graph.gb, &code);
+			break;
+		case 4:
+			hr = getGraphCodePython(view->graph.gb, &code);
 			break;
 	}
 	
@@ -197,6 +201,10 @@ void CCodeForm::OnClickedButtonSave()
 		case 3:
 			ext = _T(".lua");
 			filter = _T("Lua Files (*.lua)|*.lua|All Files (*.*)|*.*|");
+			break;
+		case 4:
+			ext = _T(".py");
+			filter = _T("Python Files (*.py)|*.py|All Files (*.*)|*.*|");
 			break;
 	}
 

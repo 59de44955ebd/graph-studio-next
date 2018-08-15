@@ -721,10 +721,13 @@
     <ClCompile Include="src\code_gen\GraphCodeCPP.cpp">
       <Filter>Code Generators</Filter>
     </ClCompile>
-    <ClCompile Include="src\code_gen\GraphCodeLUA.cpp">
+    <ClCompile Include="src\code_gen\GraphCodeCSharp.cpp">
       <Filter>Code Generators</Filter>
     </ClCompile>
-    <ClCompile Include="src\code_gen\GraphCodeCSharp.cpp">
+    <ClCompile Include="src\code_gen\GraphCodeLua.cpp">
+      <Filter>Code Generators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\code_gen\GraphCodePython.cpp">
       <Filter>Code Generators</Filter>
     </ClCompile>
   </ItemGroup>
