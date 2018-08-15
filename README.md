@@ -11,6 +11,9 @@
    * C++
    * C# (using DirectShowLib)
    * Lua (using LuaJIT and extension "directshow")
+   * Python
+   
+   The generated code is of course not meant as final application code, but only as starting point, and still needs to be adjusted to fit your actual requirements.
 
 **2. XML with relative pathes**
 
@@ -22,10 +25,6 @@
 
 **Screenshots**
 
-* A filter graph exported as Windows batch script (BAT):
-
-  ![](screenshots/bbb_spout_ndi_BAT.png)
-
 * A filter graph exported as C# code:
 
   ![](screenshots/bbb_spout_ndi_CSharp.png)
@@ -36,4 +35,9 @@
 
 * A filter graph exported as Lua (LuaJIT) code:
 
-  ![](screenshots/bbb_spout_ndi_LUA.png)
+  ![](screenshots/bbb_spout_ndi_Lua.png)
+
+* A filter graph exported as Python code:
+
+  ![](screenshots/bbb_spout_ndi_Python.png)
+  
