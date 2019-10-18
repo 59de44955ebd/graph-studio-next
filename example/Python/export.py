@@ -7,13 +7,12 @@ from ctypes import *
 from ctypes.wintypes import *
 from comtypes import client
 from comtypes.gen.DirectShowLib import *
-from win32 import constants as c
+import win32con as c
 
-client.GetModule('.\DirectShow.tlb')
-client.GetModule('qedit.dll') # DexterLib
 quartz = client.GetModule('quartz.dll')
 
 WNDPROCTYPE = WINFUNCTYPE(c_int, HWND, c_uint, WPARAM, LPARAM)
+windll.user32.DefWindowProcW.argtypes = [HWND, c_uint, WPARAM, LPARAM]
 
 EC_COMPLETE = 1
 EC_USERABORT = 2
@@ -81,7 +80,7 @@ def GetPin (filter, pinName):
 # define CLSIDs
 CLSID_FilterGraph = '{E436EBB3-524F-11CE-9F53-0020AF0BA770}'
 CLSID_LAVSplitterSource = '{B98D13E7-55DB-4385-A33D-09FD1BA26338}'
-CLSID_ffdshowVideoDecoder = '{04FE9017-F873-410E-871E-AB91661A4EF7}'
+CLSID_LAVVideoDecoder = '{EE30215D-164F-4A92-A4EB-9D4C13390F9F}'
 CLSID_LAVAudioDecoder = '{E8E73B6B-4CB3-44A4-BE99-4F7BCB96E491}'
 CLSID_VideoMixingRenderer = '{B87BEB7B-8D29-423F-AE4D-6582C10175AC}'
 CLSID_DirectSoundAudioRenderer = '{79376820-07D0-11CF-A24D-0020AFD79767}'
@@ -96,9 +95,9 @@ def BuildGraph (graph, srcFile1):
     pLAVSplitterSource_src = pLAVSplitterSource.QueryInterface(IFileSourceFilter)
     pLAVSplitterSource_src.Load(srcFile1, None)
 
-    # Add ffdshow Video Decoder
-    pffdshowVideoDecoder = client.CreateObject(CLSID_ffdshowVideoDecoder, interface = IBaseFilter)
-    graph.AddFilter(pffdshowVideoDecoder, 'ffdshow Video Decoder')
+    # Add LAV Video Decoder
+    pLAVVideoDecoder = client.CreateObject(CLSID_LAVVideoDecoder, interface = IBaseFilter)
+    graph.AddFilter(pLAVVideoDecoder, 'LAV Video Decoder')
 
     # Add LAV Audio Decoder
     pLAVAudioDecoder = client.CreateObject(CLSID_LAVAudioDecoder, interface = IBaseFilter)
@@ -113,13 +112,13 @@ def BuildGraph (graph, srcFile1):
     graph.AddFilter(pDirectSoundAudioRenderer, 'DirectSound Audio Renderer')
 
     # Connect LAV Splitter Source and ffdshow Video Decoder
-    graph.ConnectDirect(GetPin(pLAVSplitterSource, 'Video'), GetPin(pffdshowVideoDecoder, 'In'), None)
+    graph.ConnectDirect(GetPin(pLAVSplitterSource, 'Video'), GetPin(pLAVVideoDecoder, 'In'), None)
 
     # Connect LAV Splitter Source and LAV Audio Decoder
     graph.ConnectDirect(GetPin(pLAVSplitterSource, 'Audio'), GetPin(pLAVAudioDecoder, 'Input'), None)
 
     # Connect ffdshow Video Decoder and Video Mixing Renderer
-    graph.ConnectDirect(GetPin(pffdshowVideoDecoder, 'Out'), GetPin(pVideoMixingRenderer, 'VMR Input0'), None)
+    graph.ConnectDirect(GetPin(pLAVVideoDecoder, 'Out'), GetPin(pVideoMixingRenderer, 'VMR Input0'), None)
 
     # Connect LAV Audio Decoder and DirectSound Audio Renderer
     graph.ConnectDirect(GetPin(pLAVAudioDecoder, 'Output'), GetPin(pDirectSoundAudioRenderer, 'Audio Input pin (rendered)'), None)
@@ -151,7 +150,7 @@ if not hWnd:
 graph = client.CreateObject(CLSID_FilterGraph, interface=IFilterGraph)
 
 print('Building graph...')
-BuildGraph(graph, 'F:\\TMP\\graph-studio-next-enhanced\\example\\Python\\bbb_360p_10sec.mp4')
+BuildGraph(graph, 'D:\\src\\graph-studio-next-enhanced\\example\\Python\\bbb_360p_10sec.mp4')
 
 mediaControl = graph.QueryInterface(quartz.IMediaControl)
 mediaEvent = graph.QueryInterface(quartz.IMediaEvent)

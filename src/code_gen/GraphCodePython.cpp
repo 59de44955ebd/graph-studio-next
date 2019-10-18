@@ -25,13 +25,12 @@ const char * tplPythonHeader = {
 	"from ctypes.wintypes import *" EOL
 	"from comtypes import client" EOL
 	"from comtypes.gen.DirectShowLib import *" EOL
-	"from win32 import constants as c" EOL
+	"import win32con as c" EOL
 	EOL
-	"client.GetModule('.\\DirectShow.tlb')" EOL
-	"client.GetModule('qedit.dll') # DexterLib" EOL
 	"quartz = client.GetModule('quartz.dll')" EOL
 	EOL
 	"WNDPROCTYPE = WINFUNCTYPE(c_int, HWND, c_uint, WPARAM, LPARAM)" EOL
+	"windll.user32.DefWindowProcW.argtypes = [HWND, c_uint, WPARAM, LPARAM]" EOL
 	EOL
 	"EC_COMPLETE = 1" EOL
 	"EC_USERABORT = 2" EOL
